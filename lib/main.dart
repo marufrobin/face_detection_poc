@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Face Detection",
+      checkerboardRasterCacheImages: false,
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.lightBlue),
         buttonTheme: ButtonThemeData(buttonColor: Colors.lightBlue),

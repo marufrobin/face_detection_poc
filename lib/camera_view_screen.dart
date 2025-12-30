@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:face_detection_poc/face_detection/face_detection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -99,10 +100,22 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
         title: Text(widget.title),
       ),
       body: SingleChildScrollView(
-        child: Center(
+        child: Container(
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: .center,
+            spacing: 16,
             children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) => FaceDetectorView(),
+                    ),
+                  );
+                },
+                child: Text("Face Detection"),
+              ),
               videoCameraActionsButtons(),
               Container(
                 margin: .all(16),
