@@ -17,10 +17,14 @@ class CameraViewScreen extends StatefulWidget {
 
 class _CameraViewScreenState extends State<CameraViewScreen> {
   late List<CameraDescription> cameras;
+
+  late CameraController _cameraController;
+
   String? cameraName;
   String? cameraDirection;
   String? cameraLens;
   int? cameraOrientation;
+  bool? isControllerActive;
 
   Future<void> _incrementCounter() async {
     cameras = await availableCameras();
@@ -36,6 +40,7 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
     Camera Orientation: $cameraOrientation
     Camera Lens type: $cameraLens
     """);
+
     snackMessage(
       message:
           """
@@ -45,6 +50,20 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
     Camera Lens type: $cameraLens
     """,
     );
+
+    _cameraController = CameraController(selectCamera, ResolutionPreset.max);
+    _cameraController
+        .initialize()
+        .then((value) {
+          isControllerActive = true;
+          if (!mounted) {
+            return;
+          }
+        })
+        .catchError((Object e) {
+          log("Camera Controller error", error: e.toString());
+          isControllerActive = false;
+        });
     setState(() {});
   }
 
@@ -75,12 +94,28 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
         child: Column(
           mainAxisAlignment: .center,
           children: [
+            Container(
+              margin: .all(16),
+
+              // decoration: BoxDecoration(
+              //   borderRadius: BorderRadius.circular(20),
+              //   border: Border.all(width: 4),
+              // ),
+              child: ClipRRect(
+                borderRadius: BorderRadiusGeometry.all(Radius.circular(16)),
+
+                child: CameraPreview(_cameraController),
+              ),
+            ),
+            // isControllerActive ?? false
+            //     ? CameraPreview(_cameraController)
+            //     : const CircularProgressIndicator(),
             Text("""
     Camera Name: ${cameraName ?? "No Camera"}
     Camera Direction: ${cameraDirection ?? "No Direction"}
     Camera Orientation: ${cameraOrientation ?? "No Orientation"}
     Camera Lens type: ${cameraLens ?? "No Lens"}
-    """, style: Theme.of(context).textTheme.headlineMedium),
+    """, style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
       ),
