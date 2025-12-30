@@ -133,17 +133,19 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
         spacing: 20,
         mainAxisAlignment: .center,
         children: [
-          FloatingActionButton(
+          FloatingActionButton.extended(
             onPressed: () async {
               await _permissionHandel();
             },
             tooltip: 'Permission request',
-            child: const Icon(Icons.perm_camera_mic),
+            icon: const Icon(Icons.perm_camera_mic),
+            label: Text("Camera Permission"),
           ),
-          FloatingActionButton(
+          FloatingActionButton.extended(
             onPressed: _incrementCounter,
             tooltip: 'Camera button',
-            child: const Icon(Icons.camera_alt),
+            icon: const Icon(Icons.camera_alt),
+            label: Text("Start Camera"),
           ),
         ],
       ),
