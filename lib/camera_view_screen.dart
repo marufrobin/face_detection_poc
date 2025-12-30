@@ -97,33 +97,36 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            Container(
-              margin: .all(16),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: .center,
+            children: [
+              videoCameraActionsButtons(),
+              Container(
+                margin: .all(16),
 
-              // decoration: BoxDecoration(
-              //   borderRadius: BorderRadius.circular(20),
-              //   border: Border.all(width: 4),
-              // ),
-              child: ClipRRect(
-                borderRadius: BorderRadiusGeometry.all(Radius.circular(16)),
+                // decoration: BoxDecoration(
+                //   borderRadius: BorderRadius.circular(20),
+                //   border: Border.all(width: 4),
+                // ),
+                child: ClipRRect(
+                  borderRadius: BorderRadiusGeometry.all(Radius.circular(16)),
 
-                child: isControllerActive ?? false
-                    ? CameraPreview(_cameraController)
-                    : const CircularProgressIndicator(),
+                  child: isControllerActive ?? false
+                      ? CameraPreview(_cameraController)
+                      : const CircularProgressIndicator(),
+                ),
               ),
-            ),
-            cameraActionButtons(),
-            Text("""
+              cameraActionButtons(),
+              Text("""
     Camera Name: ${cameraName ?? "No Camera"}
     Camera Direction: ${cameraDirection ?? "No Direction"}
     Camera Orientation: ${cameraOrientation ?? "No Orientation"}
     Camera Lens type: ${cameraLens ?? "No Lens"}
     """, style: Theme.of(context).textTheme.bodyMedium),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: Row(
@@ -144,6 +147,60 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget videoCameraActionsButtons() {
+    return Wrap(
+      spacing: 16,
+      children: [
+        ElevatedButton.icon(
+          onPressed: () {
+            _cameraController.prepareForVideoRecording();
+            // _cameraController.resumePreview();
+          },
+          label: Text("Prepare camera"),
+          icon: Icon(Icons.run_circle_outlined),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            _cameraController.startVideoRecording(
+              onAvailable: (image) {
+                log(name: "When video available", "${image.width}");
+                snackMessage(message: "When video available");
+              },
+              enablePersistentRecording: true,
+            );
+            // _cameraController.resumePreview();
+          },
+          label: Text("Start recording"),
+          icon: Icon(Icons.emergency_recording),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            _cameraController.pauseVideoRecording();
+            // _cameraController.resumePreview();
+          },
+          label: Text("Pause recording"),
+          icon: Icon(Icons.run_circle_outlined),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            _cameraController.pauseVideoRecording();
+            // _cameraController.resumePreview();
+          },
+          label: Text("Resume recording"),
+          icon: Icon(Icons.play_circle),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            _cameraController.stopVideoRecording();
+            // _cameraController.resumePreview();
+          },
+          label: Text("Stop recording"),
+          icon: Icon(Icons.play_circle),
+        ),
+      ],
     );
   }
 
