@@ -1,0 +1,107 @@
+import 'dart:developer';
+
+import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+// late List<CameraDescription> cameras;
+
+class CameraViewScreen extends StatefulWidget {
+  const CameraViewScreen({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<CameraViewScreen> createState() => _CameraViewScreenState();
+}
+
+class _CameraViewScreenState extends State<CameraViewScreen> {
+  late List<CameraDescription> cameras;
+  String? cameraName;
+  String? cameraDirection;
+  String? cameraLens;
+  int? cameraOrientation;
+
+  Future<void> _incrementCounter() async {
+    cameras = await availableCameras();
+    log(name: "Camera Length", "${cameras.length}");
+    final selectCamera = cameras.elementAt(1);
+    cameraName = selectCamera.name;
+    cameraDirection = selectCamera.lensDirection.toString();
+    cameraOrientation = selectCamera.sensorOrientation;
+    cameraLens = selectCamera.lensType.toString();
+    log(name: "Cameras description", """
+    Camera Name: $cameraName
+    Camera Direction: $cameraDirection
+    Camera Orientation: $cameraOrientation
+    Camera Lens type: $cameraLens
+    """);
+    snackMessage(
+      message:
+          """
+    Camera Name: $cameraName
+    Camera Direction: $cameraDirection
+    Camera Orientation: $cameraOrientation
+    Camera Lens type: $cameraLens
+    """,
+    );
+    setState(() {});
+  }
+
+  Future<void> _permissionHandel() async {
+    final isCameraPermissionGranted = await Permission.camera.isGranted;
+    if (!isCameraPermissionGranted) {
+      log(name: "permission", "Click");
+      await Permission.camera.request();
+    } else {
+      snackMessage(message: "Camera permission granted ✅");
+    }
+  }
+
+  void snackMessage({required String message}) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: .center,
+          children: [
+            Text("""
+    Camera Name: ${cameraName ?? "No Camera"}
+    Camera Direction: ${cameraDirection ?? "No Direction"}
+    Camera Orientation: ${cameraOrientation ?? "No Orientation"}
+    Camera Lens type: ${cameraLens ?? "No Lens"}
+    """, style: Theme.of(context).textTheme.headlineMedium),
+          ],
+        ),
+      ),
+      floatingActionButton: Row(
+        spacing: 20,
+        mainAxisAlignment: .center,
+        children: [
+          FloatingActionButton(
+            onPressed: () async {
+              await _permissionHandel();
+            },
+            tooltip: 'Permission request',
+            child: const Icon(Icons.perm_camera_mic),
+          ),
+          FloatingActionButton(
+            onPressed: _incrementCounter,
+            tooltip: 'Camera button',
+            child: const Icon(Icons.camera_alt),
+          ),
+        ],
+      ),
+    );
+  }
+}
