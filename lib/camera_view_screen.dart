@@ -55,7 +55,6 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
     _cameraController
         .initialize()
         .then((value) {
-          isControllerActive = true;
           if (!mounted) {
             return;
           }
@@ -64,6 +63,8 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
           log("Camera Controller error", error: e.toString());
           isControllerActive = false;
         });
+    isControllerActive = true;
+
     setState(() {});
   }
 
@@ -104,12 +105,11 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadiusGeometry.all(Radius.circular(16)),
 
-                child: CameraPreview(_cameraController),
+                child: isControllerActive ?? false
+                    ? CameraPreview(_cameraController)
+                    : const CircularProgressIndicator(),
               ),
             ),
-            // isControllerActive ?? false
-            //     ? CameraPreview(_cameraController)
-            //     : const CircularProgressIndicator(),
             Text("""
     Camera Name: ${cameraName ?? "No Camera"}
     Camera Direction: ${cameraDirection ?? "No Direction"}
