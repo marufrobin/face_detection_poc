@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -129,25 +130,28 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
           ),
         ),
       ),
-      floatingActionButton: Row(
-        spacing: 20,
-        mainAxisAlignment: .center,
-        children: [
-          FloatingActionButton.extended(
-            onPressed: () async {
-              await _permissionHandel();
-            },
-            tooltip: 'Permission request',
-            icon: const Icon(Icons.perm_camera_mic),
-            label: Text("Camera Permission"),
-          ),
-          FloatingActionButton.extended(
-            onPressed: _incrementCounter,
-            tooltip: 'Camera button',
-            icon: const Icon(Icons.camera_alt),
-            label: Text("Start Camera"),
-          ),
-        ],
+      floatingActionButton: SafeArea(
+        child: Column(
+          spacing: 20,
+          mainAxisAlignment: .end,
+          crossAxisAlignment: .end,
+          children: [
+            FloatingActionButton.extended(
+              onPressed: () async {
+                await _permissionHandel();
+              },
+              tooltip: 'Permission request',
+              icon: const Icon(Icons.perm_camera_mic),
+              label: Text("Camera Permission"),
+            ),
+            FloatingActionButton.extended(
+              onPressed: _incrementCounter,
+              tooltip: 'Camera button',
+              icon: const Icon(Icons.camera_alt),
+              label: Text("Start Camera"),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -229,14 +233,50 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
         ElevatedButton.icon(
           onPressed: () async {
             // _cameraController.pausePreview();
-            final image = _cameraController.takePicture();
-            final imageName = await image.then((value) => value.name);
-            log(name: "Take image file", imageName);
+
+            try {
+              final image = await _cameraController.takePicture();
+              final imageName = image.name;
+              log(name: "Take image file", imageName);
+              snackMessage(message: "Image taken $imageName");
+              if (!context.mounted) return;
+
+              // If the picture was taken, display it on a new screen.
+              await Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => DisplayPictureScreen(
+                    // Pass the automatically generated path to
+                    // the DisplayPictureScreen widget.
+                    imagePath: image.path,
+                  ),
+                ),
+              );
+            } catch (e) {
+              // If an error occurs, log the error to the console.
+              print(e);
+            }
           },
           label: Text("Take camera"),
           icon: Icon(Icons.camera),
         ),
       ],
+    );
+  }
+}
+
+// A widget that displays the picture taken by the user.
+class DisplayPictureScreen extends StatelessWidget {
+  final String imagePath;
+
+  const DisplayPictureScreen({super.key, required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Display the Picture')),
+      // The image is stored as a file on the device. Use the `Image.file`
+      // constructor with the given path to display the image.
+      body: Image.file(File(imagePath)),
     );
   }
 }
