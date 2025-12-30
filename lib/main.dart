@@ -14,7 +14,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Face Detection",
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.lightBlue)),
+      theme: ThemeData(
+        colorScheme: .fromSeed(seedColor: Colors.lightBlue),
+        buttonTheme: ButtonThemeData(buttonColor: Colors.lightBlue),
+      ),
       home: const CameraViewScreen(title: 'Face Detection POC'),
     );
   }

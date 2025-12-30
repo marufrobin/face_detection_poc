@@ -55,9 +55,9 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
     _cameraController
         .initialize()
         .then((value) {
-          if (!mounted) {
-            return;
-          }
+          if (!mounted) return;
+
+          setState(() {});
         })
         .catchError((Object e) {
           log("Camera Controller error", error: e.toString());
@@ -82,6 +82,12 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
+  void dispose() {
+    _cameraController.dispose();
+    super.dispose();
   }
 
   @override
@@ -110,6 +116,7 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
                     : const CircularProgressIndicator(),
               ),
             ),
+            cameraActionButtons(),
             Text("""
     Camera Name: ${cameraName ?? "No Camera"}
     Camera Direction: ${cameraDirection ?? "No Direction"}
@@ -137,6 +144,40 @@ class _CameraViewScreenState extends State<CameraViewScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget cameraActionButtons() {
+    return Wrap(
+      spacing: 16,
+      children: [
+        ElevatedButton.icon(
+          onPressed: () {
+            _cameraController.pausePreview();
+            // _cameraController.resumePreview();
+          },
+          label: Text("Pause camera"),
+          icon: Icon(Icons.pause_circle_filled),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            // _cameraController.pausePreview();
+            _cameraController.resumePreview();
+          },
+          label: Text("Pause camera"),
+          icon: Icon(Icons.play_circle),
+        ),
+        ElevatedButton.icon(
+          onPressed: () async {
+            // _cameraController.pausePreview();
+            final image = _cameraController.takePicture();
+            final imageName = await image.then((value) => value.name);
+            log(name: "Take image file", imageName);
+          },
+          label: Text("Take camera"),
+          icon: Icon(Icons.camera),
+        ),
+      ],
     );
   }
 }
