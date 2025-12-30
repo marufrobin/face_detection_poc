@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,6 +37,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _permissionHandel() async {
+    final isCameraPermissionGranted = await Permission.camera.isGranted;
+    if (!isCameraPermissionGranted) {
+      await Permission.camera.request();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Camera permission granted ✅')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,10 +67,23 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      floatingActionButton: Row(
+        spacing: 20,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FloatingActionButton(
+            onPressed: () async {
+              await _permissionHandel();
+            },
+            tooltip: 'Permission request',
+            child: const Icon(Icons.perm_camera_mic),
+          ),
+          FloatingActionButton(
+            onPressed: _incrementCounter,
+            tooltip: 'Camera button',
+            child: const Icon(Icons.camera_alt),
+          ),
+        ],
       ),
     );
   }
