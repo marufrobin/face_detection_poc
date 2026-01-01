@@ -14,8 +14,14 @@ class FaceDetectorView extends StatefulWidget {
 
 class _FaceDetectorViewState extends State<FaceDetectorView> {
   final FaceDetector _faceDetector = FaceDetector(
-    options: FaceDetectorOptions(enableContours: true, enableLandmarks: true),
+    options: FaceDetectorOptions(
+      enableClassification: true,
+      enableContours: true,
+      enableLandmarks: true,
+      performanceMode: FaceDetectorMode.accurate,
+    ),
   );
+
   bool _canProcess = true;
   bool _isBusy = false;
   CustomPaint? _customPaint;
@@ -44,10 +50,14 @@ class _FaceDetectorViewState extends State<FaceDetectorView> {
   Future<void> _processImage(InputImage inputImage) async {
     if (!_canProcess) return;
     if (_isBusy) return;
+
+    ///------------------------------------------------------
+
     _isBusy = true;
     setState(() {
       _text = '';
     });
+
     final faces = await _faceDetector.processImage(inputImage);
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {

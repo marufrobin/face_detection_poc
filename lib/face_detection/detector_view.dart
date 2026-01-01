@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 
 import 'camera_view.dart';
-import 'gallery_view.dart';
 
 enum DetectorViewMode { liveFeed, gallery }
 
 class DetectorView extends StatefulWidget {
-  DetectorView({
-    Key? key,
+  const DetectorView({
+    super.key,
     required this.title,
     required this.onImage,
     this.customPaint,
@@ -19,7 +18,7 @@ class DetectorView extends StatefulWidget {
     this.onCameraFeedReady,
     this.onDetectorViewModeChanged,
     this.onCameraLensDirectionChanged,
-  }) : super(key: key);
+  });
 
   final String title;
   final CustomPaint? customPaint;
@@ -46,7 +45,16 @@ class _DetectorViewState extends State<DetectorView> {
 
   @override
   Widget build(BuildContext context) {
-    return _mode == DetectorViewMode.liveFeed
+    return CameraView(
+      customPaint: widget.customPaint,
+      onImage: widget.onImage,
+      onCameraFeedReady: widget.onCameraFeedReady,
+      onDetectorViewModeChanged: _onDetectorViewModeChanged,
+      initialCameraLensDirection: widget.initialCameraLensDirection,
+      onCameraLensDirectionChanged: widget.onCameraLensDirectionChanged,
+    );
+
+    /*return _mode == DetectorViewMode.liveFeed
         ? CameraView(
             customPaint: widget.customPaint,
             onImage: widget.onImage,
@@ -60,7 +68,7 @@ class _DetectorViewState extends State<DetectorView> {
             text: widget.text,
             onImage: widget.onImage,
             onDetectorViewModeChanged: _onDetectorViewModeChanged,
-          );
+          );*/
   }
 
   void _onDetectorViewModeChanged() {
